@@ -1,169 +1,288 @@
-import React, { useState } from 'react';
-import { FaUser, FaTags, FaList, FaSignOutAlt, FaBars, FaUserCircle } from 'react-icons/fa';
-import UsersList from './UsersList';
-import TypesList from './TypesList';
-import LabelsList from './LabelsList';
+import React, { useEffect, useState } from "react";
+import {
+  fetchAllLabels,
+  fetchAllTypes,
+  fetchAllBusinesses,
+  fetchUsers,
+  fetchIncome,
+  fetchExpenseRecords
+} from "../services/apiService.js";
 
+import LineChart from "../components/LineChart.js";
+import DoughnutChart from "../components/DoughnutChart.js";
+import BarDataChart from "../components/BarDataChart.js";
 const Dashboard = () => {
-    const [activeTab, setActiveTab] = useState('users');
-    const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [labelsLength, setLabelsLength] = useState(0);
+  const [typesLength, setTypesLength] = useState(0);
+  const [typesAndLabelsLength, setTypesAndLabelsLength] = useState(null);
+  const [businessesLength, setBusinessesLength] = useState(null);
+  const [usersLength, setusersLength] = useState(null);
+  const [newUsers, setNewUsers] = useState(null);
+  const [yearIncome, setYearIncome] = useState(null);
+  const [yearExpenseRecords, setYearExpenseRecords] = useState(null);
+  const [isLoading, setIsLoading] = useState(true)
 
-    return (
-        <div style={styles.container}>
-            {/* Sidebar */}
-            <div style={styles.sidebar}>
-                <div style={styles.logoContainer}>
-                    
-                    <h2 style={styles.logoText}>Dashboard</h2>
-                </div>
-                <button onClick={() => setActiveTab('users')} style={activeTab === 'users' ? styles.activeButton : styles.button}>
-                    <FaUser style={styles.icon} /> Users
-                </button>
-                <button onClick={() => setActiveTab('types')} style={activeTab === 'types' ? styles.activeButton : styles.button}>
-                    <FaList style={styles.icon} /> Types
-                </button>
-                <button onClick={() => setActiveTab('labels')} style={activeTab === 'labels' ? styles.activeButton : styles.button}>
-                    <FaTags style={styles.icon} /> Labels
-                </button>
+  const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    fetchAllLabels().then(data => {
+      setLabelsLength(data.length);
+    });
+
+    fetchAllTypes().then(data => {
+      setTypesLength(data.length);
+    });
+    fetchAllBusinesses().then(data => {
+      setBusinessesLength(data.length);
+    });
+
+    fetchUsers().then(data => {
+      setusersLength(data.length);
+      setNewUsers(
+        data
+          .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+          .slice(0, 8)
+      );
+    });
+    fetchIncome().then(data => {
+      setYearIncome(
+        data
+          .filter(
+            income => new Date(income.income_date).getFullYear() == currentYear
+          )
+          .reduce((total, income) => {
+            return total + parseFloat(income.gross_receipts_sales);
+          }, 0)
+      );
+    });
+
+    fetchExpenseRecords().then(data => {
+      setYearExpenseRecords(
+        data
+          .filter(expense => expense.year == currentYear)
+          .reduce((total, expense) => {
+            return total + parseFloat(expense.amount);
+          }, 0)
+      );
+      setIsLoading(false)
+    });
+  }, []);
+
+  useEffect(
+    () => {
+      setTypesAndLabelsLength(labelsLength + typesLength);
+    },
+    [labelsLength, typesLength]
+  );
+
+  return (
+
+   
+    <div>
+       {isLoading ? <div id="preloader">
+      <div id="status">
+        <div className="spinner" />
+      </div>
+    </div> :
+      <div class="page-content-wrapper ">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="page-title-box">
+{/*                 <div class="btn-group float-right">
+                  <ol class="breadcrumb hide-phone p-0 m-0">
+                    <li class="breadcrumb-item">
+                      <a href="#">Zoogler</a>
+                    </li>
+                    <li class="breadcrumb-item active">Dashboard</li>
+                  </ol>
+                </div> */}
+                <h4 class="page-title">Dashboard</h4>
+              </div>
             </div>
-
-            {/* Main Content */}
-            <div style={styles.content}>
-                {/* Header */}
-                <div style={styles.header}>
-                    <h1 style={styles.title}>Dashboard</h1>
-                    <div style={styles.profileMenu}>
-                        <FaUserCircle size={40} onClick={() => setProfileDropdownOpen(!isProfileDropdownOpen)} style={styles.profileIcon} />
-                        {isProfileDropdownOpen && (
-                            <div style={styles.dropdownMenu}>
-                                <button style={styles.dropdownItem} onClick={() => alert('Logging out...')}>
-                                    <FaSignOutAlt style={styles.dropdownIcon} /> Logout
-                                </button>
-                            </div>
-                        )}
+          </div>
+          {/* <!-- end page title end breadcrumb --> */}
+          <div class="row">
+            <div class="col-lg-9">
+              <div class="row">
+                <div class="col-lg-3">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="icon-contain">
+                        <div class="row">
+                          <div class="col-2 align-self-center">
+                            <i class="fas fa-tasks text-gradient-success" />
+                          </div>
+                          <div class="col-10 text-right">
+                            <h5 class="mt-0 mb-1">
+                              {typesAndLabelsLength && typesAndLabelsLength}
+                            </h5>
+                            <p class="mb-0 font-12 text-muted">
+                              Types and labels
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                  </div>
                 </div>
+                <div class="col-lg-3">
+                  <div class="card">
+                    <div class="card-body justify-content-center">
+                      <div class="icon-contain">
+                        <div class="row">
+                          <div class="col-2 align-self-center">
+                            <i class="far fa-gem text-gradient-danger" />
+                          </div>
+                          <div class="col-10 text-right">
+                            <h5 class="mt-0 mb-1">
+                              {businessesLength && businessesLength}
+                            </h5>
+                            <p class="mb-0 font-12 text-muted">Companies</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="icon-contain">
+                        <div class="row">
+                          <div class="col-2 align-self-center">
+                            <i class="fas fa-users text-gradient-warning" />
+                          </div>
+                          <div class="col-10 text-right">
+                            <h5 class="mt-0 mb-1">
+                              {usersLength && usersLength}
+                            </h5>
+                            <p class="mb-0 font-12 text-muted">Users</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-3">
+                  <div class="card ">
+                    <div class="card-body">
+                      <div class="icon-contain">
+                        <div class="row">
+                          <div class="col-2 align-self-center">
+                            <i class="fas fa-database text-gradient-primary" />
+                          </div>
+                          <div class="col-10 text-right">
+                            <h5 class="mt-0 mb-1">${yearExpenseRecords && yearExpenseRecords}</h5>
+                            <p class="mb-0 font-12 text-muted">Expenses</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-body">
+                  <div
+                    class="btn-group btn-group-toggle float-right"
+                    data-toggle="buttons"
+                  />
+                  <h5 class="header-title mb-4 mt-0">Current year records</h5>
 
-                {/* Content Section */}
-                <div style={styles.tabContent}>
-                    {activeTab === 'users' && <UsersList />}
-                    {activeTab === 'types' && <TypesList />}
-                    {activeTab === 'labels' && <LabelsList />}
+                  {/* <canvas id="lineChart" height="82" /> */}
+                  <LineChart />
                 </div>
+              </div>
             </div>
-        </div>
-    );
-};
+            <div class="col-lg-3">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="header-title mb-4 mt-0">Activity</h5>
+                  <div>
+                    <DoughnutChart />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xl-4">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="header-title pb-3 mt-0">New Clients</h5>
+                  <div
+                    class="table-responsive boxscroll"
+                    style={{ overflow: "hidden", outline: "none" }}
+                  >
+                    <table class="table mb-0">
+                      <tbody>
+                        {newUsers &&
+                          newUsers.map(user =>
+                            <tr>
+                              <td class="border-top-0">
+                                <div class="media">
+                                  <img
+                                    src={
+                                      user.profile_pitcure ||
+                                      "assets/images/users/avatar-2.jpg"
+                                    }
+                                    alt=""
+                                    class="thumb-md rounded-circle"
+                                  />
+                                  <div class="media-body ml-2">
+                                    <p class="mb-0">
+                                      {`${user.first_name} ${user.last_name}`}
+                                    </p>
+                                    <span class="font-12 text-muted">
+                                      {user.email}
+                                    </span>
+                                    <br />
+                                    <span class="font-12 text-muted">
+                                      {user.businesses.map(business => {
+                                        return business.business_name + " ";
+                                      })}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td class="border-top-0 text-right">
+                                <a href="#" class="btn btn-light btn-sm">
+                                  {/* <i class="far fa-comments mr-2 text-success" /> */}
+                                  View
+                                </a>
+                              </td>
+                            </tr>
+                          )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+              <div class="card">
+                <div class="card-body">
+                  <h5 class="header-title mb-4 mt-0">Monthly Income</h5>
+                  <h4 class="mb-4">
+                    Total: ${yearIncome && yearIncome}
+                  </h4>
+                  {/* <canvas id="bar-data" height="132" /> */}
+                  <BarDataChart />
+                </div>
+              </div>
+            </div>
+          </div>
 
-const styles = {
-    container: {
-        display: 'flex',
-        height: '100vh',
-        backgroundColor: '#f4f6f8',
-    },
-    sidebar: {
-        width: '250px',
-        backgroundColor: '#007bff',
-        color: '#fff',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: '20px 0',
-    },
-    logoContainer: {
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '20px',
-    },
-    logo: {
-        width: '40px',
-        height: '40px',
-    },
-    logoText: {
-        fontSize: '20px',
-        marginLeft: '10px',
-    },
-    button: {
-        padding: '15px 20px',
-        margin: '10px 0',
-        width: '100%',
-        backgroundColor: 'transparent',
-        color: '#fff',
-        border: 'none',
-        textAlign: 'left',
-        fontSize: '16px',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-    },
-    activeButton: {
-        backgroundColor: '#0056b3',
-        padding: '15px 20px',
-        margin: '10px 0',
-        width: '100%',
-        color: '#fff',
-        border: 'none',
-        textAlign: 'left',
-        fontSize: '16px',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-    },
-    icon: {
-        marginRight: '10px',
-    },
-    content: {
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-    },
-    header: {
-        backgroundColor: '#fff',
-        padding: '15px 20px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottom: '1px solid #ddd',
-    },
-    title: {
-        fontSize: '24px',
-        color: '#333',
-    },
-    profileMenu: {
-        position: 'relative',
-    },
-    profileIcon: {
-        cursor: 'pointer',
-        color: '#333',
-    },
-    dropdownMenu: {
-        position: 'absolute',
-        top: '50px',
-        right: '0',
-        backgroundColor: '#fff',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        borderRadius: '8px',
-        overflow: 'hidden',
-        zIndex: 1,
-    },
-    dropdownItem: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: '10px 15px',
-        width: '100%',
-        border: 'none',
-        backgroundColor: 'transparent',
-        cursor: 'pointer',
-    },
-    dropdownIcon: {
-        marginRight: '10px',
-    },
-    tabContent: {
-        padding: '20px',
-        backgroundColor: '#fff',
-        height: '100%',
-        overflowY: 'auto',
-    },
+          {/* <!-- end row --> */}
+        </div>
+        {/* <!-- container --> */}
+      </div>}
+      {/* <!-- Page content Wrapper --> */}
+                        
+    </div>
+  );
 };
 
 export default Dashboard;

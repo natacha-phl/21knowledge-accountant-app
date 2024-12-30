@@ -1,0 +1,353 @@
+import { useParams } from "react-router-dom";
+import { fetchUsers } from "../services/apiService";
+import { useState, useEffect } from "react";
+import LeftSideMenu from "../components/LeftSideMenu";
+import TopBar from "../components/TopBar";
+
+const UpdateUser = () => {
+
+  const [users, setUsers] = useState(null);
+  const [user, setUser] = useState(null);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    gender: "",
+    dateOfBirth: "",
+    email: "",
+    phoneNumber: "",
+    address: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    createdBy: "", 
+    password : "Abc12345678"
+  });
+  
+//   const [userData, setUserData] = useState(null);
+
+  const paramsRouter = useParams();
+
+  const userId = Number(paramsRouter.id);
+
+  useEffect(() => {
+    fetchUsers()
+      .then(data => {
+        setUsers(data);
+        setUser(data.find(user=> user.id === userId));
+        setFormData({
+            firstName: user.first_name,
+            lastName : user.last_name,
+            dateOfBirth : user.date_of_birth,
+            gender : user.date_of_birth,
+            phoneNumber : user.phone_number,
+            address : user.address,
+            city : user.city,
+            state: user.state
+
+        })
+
+      })
+      .catch(error => console.error("Error loading users:", error));
+  }, [userId]);
+
+
+  const handleSubmit = () => {};
+
+  const handleChange = (e) => {
+    
+  };
+
+  return (
+    <div>
+      <LeftSideMenu />
+
+      <div className="content-page">
+        {/* <!-- Start content --> */}
+        <div className="content">
+          <TopBar />
+
+          <div className="page-content-wrapper ">
+            <div className="container-fluid">
+              <div className="row">
+                <div className="col-sm-12">
+                  <div className="page-title-box">
+                    <div className="btn-group float-right">
+                      <ol className="breadcrumb hide-phone p-0 m-0">
+                        <li className="breadcrumb-item">
+                          <a href="#">Zoogler</a>
+                        </li>
+                        <li className="breadcrumb-item">
+                          <a href="#">Forms</a>
+                        </li>
+                        <li className="breadcrumb-item active">
+                          Ajouter un utilisateur
+                        </li>
+                      </ol>
+                    </div>
+                    <h4 className="page-title">Validation</h4>
+                  </div>
+                </div>
+              </div>
+              {/* <!-- end page title end breadcrumb --> */}
+              <div className="row">
+                <div className="col-lg-8 mx-auto">
+                  <div className="card">
+                    <div className="card-body">
+                      <h4 className="mt-0 header-title">New user</h4>
+                      <p className="text-muted mb-4 font-13">
+                        Required fields to create a new user.
+                      </p>
+
+                      {!user
+                        ? <div id="preloader">
+                            <div id="status">
+                              <div className="spinner" />
+                            </div>
+                          </div>
+                        : <form onSubmit={handleSubmit} className="" action="#">
+                            <div className="form-group">
+                              <label>First Name</label>
+                              <input
+                                name="first_name"
+                                type="text"
+                                className="form-control"
+                                required
+                                value={user.first_name || ""}
+                                placeholder="Enter the user's first name"
+                                onChange={handleChange}
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label>Last Name</label>
+                              <div>
+                                <input
+                                  name="last_name"
+                                  type="text"
+                                  id="pass2"
+                                  className="form-control"
+                                  required
+                                  placeholder="Enter the user's last name"
+                                  onChange={handleChange}
+                                  value={user.last_name ||""}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="form-group">
+                              <label>E-Mail</label>
+                              <div>
+                                <input
+                                  name="email"
+                                  type="email"
+                                  className="form-control"
+                                  required
+                                  parsley-type="email"
+                                  placeholder="Enter the user's valid e-mail"
+                                  onChange={handleChange}
+                                  value={user.email || ""}
+                                />
+                              </div>
+                            </div>
+
+                            <p className="text-muted mb-4 mt-4 font-13">Optional</p>
+                            <div className="form-group">
+                              <label>Gender</label>
+                              <div>
+                                <div className="custom-control custom-checkbox">
+                                  <input
+                                    name="gender"
+                                    type="radio"
+                                    className="custom-control-input"
+                                    id="customCheck1"
+                                    value="Male"
+                                    onChange={handleChange}
+                                  />
+                                  <label
+                                    className="custom-control-label"
+                                    for="customCheck1"
+                                  >
+                                    Male
+                                  </label>
+                                </div>
+                                <div className="custom-control custom-checkbox">
+                                  <input
+                                    name="gender"
+                                    type="radio"
+                                    className="custom-control-input"
+                                    id="customCheck2"
+                                    data-parsley-multiple="groups"
+                                    data-parsley-mincheck="2"
+                                    value="Female"
+                                    onChange={handleChange}
+                                  />
+                                  <label
+                                    className="custom-control-label"
+                                    for="customCheck2"
+                                  >
+                                    Female
+                                  </label>
+                                </div>
+
+                                <div className="custom-control custom-checkbox">
+                                  <input
+                                    name="gender"
+                                    type="radio"
+                                    className="custom-control-input"
+                                    id="customCheck2"
+                                    data-parsley-multiple="groups"
+                                    data-parsley-mincheck="2"
+                                    value="Non-binary"
+                                    onChange={handleChange}
+                                  />
+                                  <label
+                                    className="custom-control-label"
+                                    for="customCheck2"
+                                  >
+                                    Non-binary
+                                  </label>
+                                </div>
+
+                                <div className="custom-control custom-checkbox">
+                                  <input
+                                    name="gender"
+                                    type="radio"
+                                    className="custom-control-input"
+                                    id="customCheck2"
+                                    data-parsley-multiple="groups"
+                                    data-parsley-mincheck="2"
+                                    value="Prefer not to say"
+                                    onChange={handleChange}
+                                  />
+                                  <label
+                                    className="custom-control-label"
+                                    for="customCheck2"
+                                  >
+                                    Prefer not to say
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="col-md-6">
+                              <label
+                                className="custom-control-label"
+                                for="customCheck2"
+                              >
+                                Date of Birth
+                              </label>
+                              <input
+                                name="date_of_birth"
+                                type="text"
+                                className="form-control"
+                                placeholder="YYYY-MM-DD"
+                                id="mdate"
+                                onChange={handleChange}
+                                value={user.date_of_birth}
+                              />
+                            </div>
+
+                            <div className="form-group">
+                              <label>Phone Number</label>
+                              <div>
+                                <input
+                                  name="phone_number"
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Enter the user's phone number"
+                                  onChange={handleChange}
+                                  value={user.phone_number ||""}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group">
+                              <label>Street</label>
+                              <div>
+                                <input
+                                  name="address"
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Enter the user's street address"
+                                  onChange={handleChange}
+                                  value={user.address ||""}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group">
+                              <label>City</label>
+                              <div>
+                                <input
+                                  name="city"
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Enter the user's city address"
+                                  onChange={handleChange}
+                                  value={user.city}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group">
+                              <label>State</label>
+                              <div>
+                                <input
+                                  name="state"
+                                  data-parsley-type="alphanum"
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Enter the user's state address"
+                                  onChange={handleChange}
+                                  value={user.state}
+                                />
+                              </div>
+                            </div>
+                            <div className="form-group">
+                              <label>Postal Code</label>
+                              <div>
+                                <input
+                                  name="postal_code"
+                                  type="text"
+                                  className="form-control"
+                                  placeholder="Enter the user's postal code address"
+                                  onChange={handleChange}
+                                  value={user.postal_code}
+                                />
+                              </div>
+                            </div>
+
+                            <div className="form-group mb-0">
+                              <div>
+                                <button
+                                  type="submit"
+                                  className="btn btn-primary waves-effect waves-light"
+                                >
+                                  Submit
+                                </button>
+                                <button
+                                  type="reset"
+                                  className="btn btn-secondary waves-effect m-l-5"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          </form>}
+                    </div>
+                  </div>
+                </div>
+                {/* <!-- end col --> */}
+              </div>
+              {/* <!-- end row -->  */}
+            </div>
+            {/* <!-- container --> */}
+          </div>
+          {/* <!-- Page content Wrapper --> */}
+        </div>
+        {/* <!-- End Right content here --> */}
+      </div>
+      {/* <!-- END wrapper --> */}
+    </div>
+  );
+};
+
+export default UpdateUser;

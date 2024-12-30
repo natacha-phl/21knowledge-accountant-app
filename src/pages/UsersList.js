@@ -1,102 +1,308 @@
-import React, { useEffect, useState } from 'react';
-import { fetchUsers, createUser, deleteUser } from '../services/apiService';
+import React, { useEffect, useState } from "react";
+import { fetchUsers, deleteUser } from "../services/apiService";
+import UserListModal from "../components/UserListModal";
+import DataTable from "react-data-table-component";
+import AddUserModal from "../components/AddUserModal";
+import Footer from "../components/Footer";
+
 
 const UsersList = () => {
-    const [users, setUsers] = useState([]);
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [email, setEmail] = useState('');
+  // VARIABLE
 
-    // Fetch users from the API when the component mounts
-    useEffect(() => {
-        fetchUsers()
-            .then((data) => setUsers(data))
-            .catch((error) => console.error('Error loading users:', error));
-    }, []);
+  const [users, setUsers] = useState([]);
+  const [userId, setUserId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isInputDisabled, setIsInputDisabled] = useState(false);
+  const [isModalAddUserOpen, setIsModalAddUserOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [isDisabledTrash, setIsDisabledTrash] = useState(true)
 
-    const addUser = () => {
-        if (firstName.trim() === '' || lastName.trim() === '' || email.trim() === '') return;
+  // FETCH ALL USERS
+  useEffect(
+    () => {
+      fetchUsers()
+        .then(data => {
+          const dataFiltered = data.filter(userFiltered => {
+            return (
+              (userFiltered.first_name?.toLowerCase()
+                .includes(searchTerm.toLowerCase()) ||"") ||
+              (userFiltered.last_name?.toLowerCase()
+                .includes(searchTerm.toLowerCase()) ||"") ||
+              (userFiltered.phone_number?.toLowerCase()
+                .includes(searchTerm.toLowerCase()) ||"") ||
+              (userFiltered.email?.toLowerCase()
+                .includes(searchTerm.toLowerCase()) , "") ||
+              userFiltered.businesses?.some(business =>
+                business.business_name
+                  .toLowerCase()
+                  .includes(searchTerm.toLowerCase())
+              )
+            );
+          });
+          // setUsers(data);
+          setUsers(dataFiltered);
+          setIsLoading(false)
+          setIsDisabledTrash("true")
+        })
+        .catch(error => console.error("Error loading users:", error));
+    },
+    [searchTerm]
+ );
 
-        const newUser = {
-            first_name: firstName,
-            last_name: lastName,
-            email,
-        };
+  // REMOVE USERS
 
-        createUser(newUser)
-            .then((createdUser) => {
-                setUsers([...users, createdUser]);
-                setFirstName('');
-                setLastName('');
-                setEmail('');
-            })
-            .catch((error) => console.error('Error adding user:', error));
-    };
-
-    const removeUser = (id) => {
-        const user = users.find(user => user.id === id);
-        const confirmDelete = window.confirm(`Are you sure you want to delete ${user.first_name} ${user.last_name}?`);
-
-        if (confirmDelete) {
-            deleteUser(id)
-                .then(() => {
-                    setUsers(users.filter(user => user.id !== id));
-                })
-                .catch((error) => console.error('Error deleting user:', error));
-        }
-    };
-
-    return (
-        <div className="container mt-4">
-            <h2 className="mb-4">Users</h2>
-            <div className="input-group mb-3">
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="First Name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                />
-                <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Last Name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                />
-                <input
-                    type="email"
-                    className="form-control"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
-                <button className="btn btn-primary" onClick={addUser}>
-                    Add User
-                </button>
-            </div>
-            <ul className="list-group">
-                {users.map(user => (
-                    <li key={user.id} className="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>{user.first_name} {user.last_name}</strong> - {user.email}
-                            <br />
-                            {user.businesses && user.businesses.length > 0 ? (
-                                <span className="text-muted">
-                                    Business: {user.businesses.map(business => business.business_name).join(', ')}
-                                </span>
-                            ) : (
-                                <span className="text-muted">No associated business</span>
-                            )}
-                        </div>
-                        <button className="btn btn-danger btn-sm" onClick={() => removeUser(user.id)}>
-                            Delete
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </div>
+  const removeUser = id => {
+    const user = users.find(user => user.id === id);
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete ${user.first_name} ${user.last_name} ?`
     );
+
+    if (confirmDelete) {
+      deleteUser(id)
+        .then(() => {
+          setUsers(users.filter(user => user.id !== id));
+        })
+        .catch(error => console.error("Error deleting user:", error));
+    }
+  };
+
+
+  const removeUsers = usersSeletected => {
+
+    if (Array.isArray(usersSeletected)){
+
+      const usersId = usersSeletected.map(user => user.id)
+      console.log(usersId)
+
+      let usersNames = [];
+
+      usersId.forEach(userId => {
+        users
+          .filter(user => user.id == userId)
+          .forEach(user => usersNames.push(user.first_name + " " + user.last_name));
+      });
+           
+        
+      
+
+      console.log(usersNames)
+
+      const confirmDelete = window.confirm(
+        `Are you sure you want to delete : ${usersNames.join(' and ')}`
+      );
+
+      usersId.forEach(userId =>{
+
+
+      if (confirmDelete) {
+        deleteUser(userId)
+          .then(() => {
+            setUsers(users.filter(user => user.id !== userId));
+          })
+          .catch(error => console.error("Error deleting user:", error));
+      }
+    })
+
+    }
+  
+  }
+
+  // MODAL FUNCTION
+
+  const showModal = id => {
+    setUserId(id);
+
+    setIsModalOpen(true);
+    setIsInputDisabled(false);
+  };
+
+  const unShowModal = () => {
+    setIsModalOpen(false);
+    setIsModalAddUserOpen(false);
+  };
+
+  const showModalReadOnly = id => {
+    setUserId(id);
+
+    setIsInputDisabled(true);
+    setIsModalOpen(true);
+  };
+
+  const showModalAdd = () => {
+    setIsModalAddUserOpen(true);
+  };
+
+  // DATATABLE
+
+  const columns = [
+    {
+      name: "Name",
+      selector: row => `${row.first_name} ${row.last_name} `,
+      sortable: true,
+    },
+    {
+      name: "Email",
+      selector: row => row.email,
+      sortable: true,
+    },
+    {
+      name: "Phone Number",
+      selector: row => row.phone_number,
+      sortable: true,
+    },
+
+    {
+      name: "Companies",
+      selector: row =>
+        row.businesses.map(business => {
+          return business.business_name + " ";
+        }),
+      sortable: true,
+      width : "300px"
+    },
+    {
+      name: "Actions",
+      cell: row =>
+        <div className="d-flex">
+          <button className="btn btn-primary waves-effect waves-light"
+            onClick={() => showModalReadOnly(row.id)}
+            style={{ marginRight: "10px" }}
+          >
+            <i style={{ cursor: "pointer" }} className="fa-solid fa-eye" />
+          </button>
+          <button className="btn btn-primary waves-effect waves-light"
+            onClick={() => showModal(row.id)}
+            style={{ marginRight: "10px" }}
+          >
+            <i
+              style={{ cursor: "pointer" }}
+              className="fa-solid fa-pen-to-square"
+            />
+          </button>
+          <button className="btn btn-primary waves-effect waves-light" onClick={() => removeUser(row.id)}>
+            <i style={{ cursor: "pointer" }} className="fa-solid fa-trash" />
+          </button>
+        </div>,
+      ignoreRowClick: true,
+      allowOverflow: true,
+      button: true,
+      width: "150px"
+    }
+  ];
+
+
+  const handleSelectedRowChange = (state) => {
+    const rows = state.selectedRows;
+    setSelectedRows(rows)
+    if(rows.length>=1){
+      setIsDisabledTrash(false)
+      } else {
+        setIsDisabledTrash(true)
+      }
+  }
+
+
+
+  return (
+    <div>
+      <UserListModal
+        users={users}
+        userId={userId}
+        isModalOpen={isModalOpen}
+        unShowModal={unShowModal}
+        isInputDisabled={isInputDisabled}
+      />
+
+      <AddUserModal
+        isModalAddUserOpen={isModalAddUserOpen}
+        unShowModal={unShowModal}
+      />
+
+
+
+          <div className="row">
+            <div className="col-sm-12">
+              <div className="page-title-box">
+               {/*  <div className="btn-group float-right">
+                  <ol className="breadcrumb hide-phone p-0 m-0">
+                    <li className="breadcrumb-item">
+                      <a href="#">Zoogler</a>
+                    </li>
+                    <li className="breadcrumb-item">
+                      <a href="#">Tables</a>
+                    </li>
+                    <li className="breadcrumb-item active">Datatable</li>
+                  </ol>
+                </div> */}
+                <h4 className="page-title">Users</h4>
+              </div>
+            </div>
+          </div>
+
+          {isLoading && users.length < 1
+            ? <div id="preloader">
+                <div id="status">
+                  <div className="spinner" />
+                </div>
+              </div>
+            : <div className="row">
+                <div className="col-12">
+                  <div className="card">
+                    
+                    
+                    <div className="card-body  ">
+
+                      <div><button hidden={isDisabledTrash} className="btn btn-primary waves-effect waves-light" onClick={() => removeUsers(selectedRows)}><i style={{ cursor: "pointer" }} className="fa-solid fa-trash"/></button>
+
+                        </div>
+
+                      <div className="d-flex d-flex flex-wrap justify-content-end ">
+
+                      <form>
+                        <input
+                          type="text"
+                          className="form-control"
+                          name="defaultconfig"
+                          id="defaultconfig"
+                          onChange={e => {
+                            setSearchTerm(e.target.value);
+                          }}
+                        />
+                      </form>
+                      <button style={{marginLeft: "42px"}}
+                        onClick={showModalAdd}
+                        className="btn btn-primary waves-effect waves-light ms-auto"
+                      >
+                        {" "}Add
+                      </button>
+                      </div>
+                      <DataTable
+                        columns={columns}
+                        data={users}
+                        pagination
+                        highlightOnHover
+                        selectableRows  
+                        onSelectedRowsChange={handleSelectedRowChange}  
+                        responsive
+                        dense
+                              
+                      />
+                      {/* <button hidden={isDisabledTrash} className="btn btn-primary waves-effect waves-light" onClick={() => removeUsers(selectedRows)}><i style={{ cursor: "pointer" }} className="fa-solid fa-trash"/></button> */}
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>}
+  
+      <Footer/>
+    </div>
+
+    
+  );
+
+
 };
 
 export default UsersList;
