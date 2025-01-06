@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://192.168.1.111:8000/api";
+const API_URL = "http://172.20.10.4:8000/api";
 
 const api = axios.create({
   baseURL: API_URL
@@ -61,8 +61,7 @@ export const createType = typeData => {
     });
 };
 
-//Get all expenses records
-
+// Get all expenses records
 export const fetchExpenseRecords = () => {
   return api
     .get("/expense-records")
@@ -74,8 +73,7 @@ export const fetchExpenseRecords = () => {
 };
 
 
-//Get all income records
-
+// Get all income records
 export const fetchIncome = () => {
   return api
     .get("/income")
@@ -100,7 +98,6 @@ export const deleteType = typeId => {
 
 
 // Modify / Patch types
-
 export const patchTypes = (typeId, typeData) => {
   return api
   .patch(`/expense-types/${typeId}`, typeData)
@@ -126,7 +123,7 @@ export const fetchLabels = expenseTypeId => {
 };
 
 
-// Fetch ALL labels 
+// Fetch all labels 
 export const fetchAllLabels = () => {
   return api
     .get("/expense-labels")
@@ -150,7 +147,7 @@ export const createLabel = labelData => {
 };
 
 
-// Fetch ALL types 
+// Fetch all types 
 export const fetchAllTypes = () => {
   // This assumes you have a custom route like /expense-types/{id}/labels
   return api
@@ -174,7 +171,7 @@ export const deleteLabel = labelId => {
     });
 };
 
-// Creating a new user (POST request)
+// Creating a new user 
 export const createUser = userData => {
   return api
     .post("/users", userData)
@@ -185,7 +182,7 @@ export const createUser = userData => {
     });
 };
 
-// Example of deleting a user (DELETE request)
+// Deleting a user 
 export const deleteUser = userId => {
   return api
     .delete(`/users/${userId}`)
@@ -197,8 +194,7 @@ export const deleteUser = userId => {
 };
 
 
-// Modify / Patch user
-
+// Modifying / Patching user
 export const patchUser = (userId, userData) => {
   return api
   .patch(`/users/${userId}`, userData)
@@ -213,7 +209,6 @@ export const patchUser = (userId, userData) => {
 
 
 // Get all businesses
-
 export const fetchAllBusinesses = () => {
   return api
     .get("/businesses")

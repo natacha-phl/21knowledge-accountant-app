@@ -4,8 +4,23 @@ import LeftSideMenu from "../components/LeftSideMenu";
 import TopBar from "../components/TopBar";
 
 const AddUser = () => {
+
+  const lowerCase = "abcdefghijklmnopqrstuvwxyz";
+  const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const numbers = "0123456789";
+  const specialChars = "!@#$%^&*()_+[]{}|;:,.<>?";
+
+  function getRandomLetters(lowerCase, upperCase, numbers, specialChars) {
+    let result = "";
+    for (let i = 0; i < 2; i++) {
+        const randomIndex = Math.floor(Math.random() * lowerCase.length);
+        result += lowerCase[randomIndex];
+    }
+    return result;
+}
+
   const [formData, setFormData] = useState({
-    firstName: "",
+    /*     firstName: "",
     lastName: "",
     gender: "",
     dateOfBirth: "",
@@ -15,8 +30,8 @@ const AddUser = () => {
     city: "",
     state: "",
     postalCode: "",
-    createdBy: "", 
-    password : "Abc12345678"
+    createdBy: "",  */
+    password: "Abc12345678"
   });
 
   const handleChange = e => {
@@ -24,20 +39,18 @@ const AddUser = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();   
-    createUser(formData)
+  const handleSubmit = e => {
+    e.preventDefault();
+    createUser(formData);
   };
 
   return (
     <div>
       <LeftSideMenu />
-
       <div className="content-page">
         {/* <!-- Start content --> */}
         <div className="content">
           <TopBar />
-
           <div className="page-content-wrapper ">
             <div className="container-fluid">
               <div className="row">
@@ -171,8 +184,7 @@ const AddUser = () => {
                               </label>
                             </div>
 
-
-                                                        <div className="custom-control custom-checkbox">
+                            <div className="custom-control custom-checkbox">
                               <input
                                 name="gender"
                                 type="radio"
@@ -271,7 +283,6 @@ const AddUser = () => {
                             />
                           </div>
                         </div>
-
                         <div className="form-group mb-0">
                           <div>
                             <button

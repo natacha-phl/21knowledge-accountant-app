@@ -6,7 +6,7 @@
  */
 
 
-!function($) {
+/* function($) {
     "use strict";
 
     var AdvancedForm = function() {};
@@ -187,4 +187,4 @@
 function ($) {
     "use strict";
     $.AdvancedForm.init();
-}(window.jQuery);
+}(window.jQuery); */

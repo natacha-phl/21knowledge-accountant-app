@@ -11,6 +11,8 @@ import {
 import LineChart from "../components/LineChart.js";
 import DoughnutChart from "../components/DoughnutChart.js";
 import BarDataChart from "../components/BarDataChart.js";
+
+
 const Dashboard = () => {
   const [isProfileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [labelsLength, setLabelsLength] = useState(0);

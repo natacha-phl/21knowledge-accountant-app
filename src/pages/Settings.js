@@ -247,7 +247,7 @@ const Settings = () => {
             aria-current="page"
             style={activeTab === "home-office" ? styleOnClick : {}}
           >
-            <h2>Home-office</h2>
+            <h2>Expenses cat 1</h2>
           </a>
         </li>
         <li class="nav-item">
@@ -259,7 +259,7 @@ const Settings = () => {
             class="nav-link"
             style={activeTab === "vehicles" ? styleOnClick : {}}
           >
-            <h2>Vehicles</h2>
+            <h2>Expenses cat 2</h2>
           </a>
         </li>
       </ul>

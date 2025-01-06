@@ -7,7 +7,6 @@ import SignUpPage from './pages/SignUpPage';
 import UsersList from './pages/UsersList';
 import AddUser from './pages/AddUser';
 import UpdateUser from './pages/UpdateUser';
-import Dashboard2 from './pages/Dashboard copy';
 import Settings from './pages/Settings';
 
 const AppRoutes = () => {
@@ -21,10 +20,6 @@ const AppRoutes = () => {
             <Route path="/adduser" element={<PrivateRoute><AddUser/></PrivateRoute>} />
             <Route path="/user/:id" element={<PrivateRoute><UpdateUser/></PrivateRoute>} />
             <Route path="settings" element={<PrivateRoute><Settings/></PrivateRoute>} />
-
-
-            {/* Route test à supp  */}
-            <Route path="/dashboard2" element={<PrivateRoute><Dashboard2 /></PrivateRoute>} />
 
         </Routes>
     );
