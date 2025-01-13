@@ -2,22 +2,42 @@ import { createUser } from "../services/apiService";
 import { useState } from "react";
 import LeftSideMenu from "../components/LeftSideMenu";
 import TopBar from "../components/TopBar";
+import { EmailJSResponseStatus } from "emailjs-com";
 
 const AddUser = () => {
-
   const lowerCase = "abcdefghijklmnopqrstuvwxyz";
   const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const numbers = "0123456789";
   const specialChars = "!@#$%^&*()_+[]{}|;:,.<>?";
 
-  function getRandomLetters(lowerCase, upperCase, numbers, specialChars) {
+  const getRandomChars = chars => {
     let result = "";
-    for (let i = 0; i < 2; i++) {
-        const randomIndex = Math.floor(Math.random() * lowerCase.length);
-        result += lowerCase[randomIndex];
+    for (let i = 0; i < 4; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return result;
-}
+  };
+
+  const temporaryPassword = () => {
+    const passwordPart1 = getRandomChars(lowerCase, 3);
+    const passwordPart2 = getRandomChars(upperCase, 3);
+    const passwordPart3 = getRandomChars(numbers, 3);
+    const passwordPart4 = getRandomChars(specialChars, 3);
+
+    const passwordToReorder = passwordPart1+passwordPart2+passwordPart3+passwordPart4
+
+
+    // for (let i = 0; i<
+
+
+    return passwordToReorder
+  };
+
+
+  temporaryPassword()
+  console.log(temporaryPassword)
+
+
 
   const [formData, setFormData] = useState({
     /*     firstName: "",
@@ -31,8 +51,10 @@ const AddUser = () => {
     state: "",
     postalCode: "",
     createdBy: "",  */
-    password: "Abc12345678"
+    password: temporaryPassword()
   });
+
+
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -43,6 +65,10 @@ const AddUser = () => {
     e.preventDefault();
     createUser(formData);
   };
+
+
+  console.log(temporaryPassword())
+
 
   return (
     <div>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://172.20.10.4:8000/api";
+const API_URL = "http://127.0.0.1:8000/api";
 
 const api = axios.create({
   baseURL: API_URL
@@ -209,6 +209,7 @@ export const patchUser = (userId, userData) => {
 
 
 // Get all businesses
+
 export const fetchAllBusinesses = () => {
   return api
     .get("/businesses")
