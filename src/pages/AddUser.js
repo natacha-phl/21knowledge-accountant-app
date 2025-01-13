@@ -27,16 +27,8 @@ const AddUser = () => {
     const passwordToReorder = passwordPart1+passwordPart2+passwordPart3+passwordPart4
 
 
-    // for (let i = 0; i<
-
-
     return passwordToReorder
   };
-
-
-  temporaryPassword()
-  console.log(temporaryPassword)
-
 
 
   const [formData, setFormData] = useState({

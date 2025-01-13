@@ -12,7 +12,6 @@ const UserListModal = ({
 }) => {
   const user = users.find(user => user.id == userId);
 
-  // const [user, setUser] = useState(null);
   const [formData, setFormData] = useState(null);
 
   useEffect(
@@ -287,18 +286,6 @@ const UserListModal = ({
                       />
                     </div>
                   </div>
-
-{/*                   <div className="form-group mb-0">
-                    <div>
-                      <button
-                        hidden={isInputDisabled}
-                        type="submit"
-                        className="btn btn-primary waves-effect waves-light"
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  </div> */}
                   <button
                   onClick={unShowModal}
                   type="button"
