@@ -25,3 +25,4 @@ yarn-error.log*
 
 # Ignorer des fichiers supplémentaires
 src/components/BarDataChart\ copy.js
+src/components/LineChart\ copy.js

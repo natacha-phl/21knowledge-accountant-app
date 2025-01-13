@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
-import Chart from "chart.js/auto"; // Importation de la bibliothèque Chart.js
+import Chart from "chart.js/auto"; 
 import { fetchExpenseRecords, fetchIncome } from "../services/apiService";
 
 const DoughnutChart = () => {
-  const canvasRef = useRef(null); // Crée une référence pour le canvas
-  const chartRef = useRef(null); // Référence pour le graphique
+  const canvasRef = useRef(null); 
+  const chartRef = useRef(null); 
   const currentYear = new Date().getFullYear();
 
   const [expenseRecords, setExpenseRecords] = useState();
@@ -43,8 +43,7 @@ const DoughnutChart = () => {
         if (chartRef.current) {
           chartRef.current.destroy();
         }
-        const ctx = canvasRef.current.getContext("2d"); // Récupère le contexte du canvas
-
+        const ctx = canvasRef.current.getContext("2d"); 
         chartRef.current = new Chart(ctx, {
           type: "doughnut",
           data: {
