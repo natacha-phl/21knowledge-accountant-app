@@ -1,147 +1,27 @@
 import React, { useRef, useEffect, useState } from "react";
-import Chart from "chart.js/auto"; // Importation de la bibliothèque Chart.js
+import Chart from "chart.js/auto";
 import { fetchIncome } from "../services/apiService";
 
 const BarDataChart = () => {
-  const canvasRef = useRef(null); // Crée une référence pour le canvas
-  const chartRef = useRef(null); // Référence pour le graphique
+  const canvasRef = useRef(null);
+  const chartRef = useRef(null);
   const currentYear = new Date().getFullYear();
-  const [incomeJan, setIncomeJan] = useState(0);
-  const [incomeFeb, setIncomeFeb] = useState(0);
-  const [incomeMar, setIncomeMar] = useState(0);
-  const [incomeApr, setIncomeApr] = useState(0);
-  const [incomeMay, setIncomeMay] = useState(0);
-  const [incomeJun, setIncomeJun] = useState(0);
-  const [incomeJul, setIncomeJul] = useState(0);
-  const [incomeAug, setIncomeAug] = useState(0);
-  const [incomeSep, setIncomeSep] = useState(0);
-  const [incomeOct, setIncomeOct] = useState(0);
-  const [incomeNov, setIncomeNov] = useState(0);
-  const [incomeDec, setIncomeDec] = useState(0);
+
+  const [incomes, setIncomes] = useState(Array(12).fill(0));
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetchIncome().then(data => {
-      setIncomeJan(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 1)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeFeb(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 2)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeMar(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 3)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeApr(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 4)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeMay(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 5)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeJun(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 6)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeJul(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 7)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeAug(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 8)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeSep(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 9)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeOct(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 10)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeNov(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 11)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
-      setIncomeDec(
-        data
-          .filter(
-            income => new Date(income.income_date).getFullYear() == currentYear
-          )
-          .filter(income => new Date(income.income_date).getMonth() + 1 == 11)
-          .reduce((total, income) => {
-            return total + parseFloat(income.gross_receipts_sales);
-          }, 0)
-      );
+      const monthlyIncomes = Array(12).fill(0);
+      data.forEach(income => {
+        const incomeDate = new Date(income.income_date);
+        if (incomeDate.getFullYear() === currentYear) {
+          const month = incomeDate.getMonth();
+          monthlyIncomes[month] += parseFloat(income.gross_receipts_sales);
+          setIncomes(monthlyIncomes);
+        }
+      });
+
       setIsLoading(false);
     });
   }, []);
@@ -152,9 +32,8 @@ const BarDataChart = () => {
         if (chartRef.current) {
           chartRef.current.destroy();
         }
-        const ctx = canvasRef.current.getContext("2d"); // Récupère le contexte du canvas
+        const ctx = canvasRef.current.getContext("2d");
 
-        // Crée le graphique avec Chart.js
         chartRef.current = new Chart(ctx, {
           type: "bar",
           data: {
@@ -175,20 +54,7 @@ const BarDataChart = () => {
             datasets: [
               {
                 label: "Revenue",
-                data: [
-                  incomeJan,
-                  incomeFeb,
-                  incomeMar,
-                  incomeApr,
-                  incomeMay,
-                  incomeJun,
-                  incomeJul,
-                  incomeAug,
-                  incomeSep,
-                  incomeOct,
-                  incomeNov,
-                  incomeDec
-                ],
+                data: incomes,
                 borderColor: "#5ecbf6",
                 backgroundColor: "#8d44ad",
                 hoverBackgroundColor: "#5ecbf6",
@@ -242,10 +108,10 @@ const BarDataChart = () => {
           }
         });
         return () => {
-            if (chartRef.current) {
-              chartRef.current.destroy();
-            }
-          };
+          if (chartRef.current) {
+            chartRef.current.destroy();
+          }
+        };
       }
     },
     [isLoading]
